@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<!-- Created by Axo's Stuff 2026 -->
+<!-- UI redesigned -->
+<!-- Credits to @allvideo for the original inspiration -->
+<!-- Usage of this software to create scams, malware, exploits is prohibited -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EZ Publish Service</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111114;
+      --surface2: #18181d;
+      --border: #252530;
+      --border-bright: #35354a;
+      --red: #e5172d;
+      --red-dim: #7a0d18;
+      --red-glow: rgba(229,23,45,0.18);
+      --green: #00e5a0;
+      --amber: #f5a623;
+      --text: #e8e8f0;
+      --muted: #5a5a72;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(229,23,45,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(229,23,45,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── TOPBAR ─────────────────────────────────────────── */
+    .topbar {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,11,0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 15% 100%, 0 85%);
+    }
+
+    .topbar-title {
+      font-family: var(--sans);
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+
+    .topbar-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--red);
+      background: var(--red-glow);
+      border: 1px solid var(--red-dim);
+      padding: 2px 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .topbar-right {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── CONTAINER ──────────────────────────────────────── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+
+    /* ── TABS ───────────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 2px;
+    }
+
+    .tab {
+      padding: 12px 22px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      top: 1px;
+    }
+
+    .tab:first-child { border-radius: 4px 0 0 0; }
+    .tab:last-child  { border-radius: 0 4px 0 0; }
+
+    .tab.active {
+      color: var(--text);
+      background: var(--surface2);
+      border-color: var(--border-bright);
+      border-bottom: 1px solid var(--surface2);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--surface2);
+    }
+
+    .tab:hover:not(.active) {
+      color: #8888aa;
+      background: #141418;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── CARD ───────────────────────────────────────────── */
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--border-bright);
+      border-radius: 0 4px 4px 4px;
+      padding: 28px 28px 24px;
+    }
+
+    /* ── FIELD ──────────────────────────────────────────── */
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field label .lnum {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--border-bright);
+      font-size: 9px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.03em;
+    }
+
+    .field input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px var(--red-glow);
+    }
+
+    .field input::placeholder { color: #2e2e3e; }
+
+    .field .hint {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: #3a3a52;
+      margin-top: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .row .field { margin-bottom: 0; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 22px 0;
+      position: relative;
+    }
+
+    .divider::after {
+      content: '//';
+      position: absolute;
+      left: 0;
+      top: -9px;
+      background: var(--surface2);
+      padding-right: 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--border-bright);
+    }
+
+    /* ── STATUS ─────────────────────────────────────────── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--border-bright);
+      flex-shrink: 0;
+    }
+
+    .dot.running {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    .dot.done {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    .dot.error {
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ── PROGRESS ───────────────────────────────────────── */
+    .progress-bar-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 0;
+      margin-bottom: 22px;
+      overflow: visible;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--red);
+      width: 0%;
+      transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: -3px;
+      width: 3px;
+      height: 9px;
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    /* ── BUTTONS ────────────────────────────────────────── */
+    .btn-row { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 12px 22px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .btn-primary:hover { background: #f5203a; box-shadow: 0 0 20px var(--red-glow); }
+    .btn-primary:active { background: #c0121f; }
+
+    .btn-primary:disabled {
+      background: var(--red-dim);
+      color: #5a2030;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border-bright);
+    }
+
+    .btn-secondary:hover { border-color: #55556a; color: #8888aa; }
+
+    /* ── LOG ────────────────────────────────────────────── */
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .log-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      height: 340px;
+      overflow-y: auto;
+      padding: 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 2;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-bright) transparent;
+    }
+
+    .log-box:empty::before {
+      content: '// no output yet';
+      color: var(--border-bright);
+    }
+
+    .log-line { display: flex; gap: 14px; }
+    .log-ts   { color: var(--border-bright); flex-shrink: 0; user-select: none; }
+    .log-ok   { color: var(--green); }
+    .log-err  { color: var(--red); }
+    .log-info { color: var(--amber); }
+
+    .btn-link {
+      background: none;
+      border: none;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .btn-link:hover { color: var(--text); }
+
+    /* ── FOOTER ─────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--border-bright);
+      letter-spacing: 0.1em;
+      margin-top: 40px;
+      padding-bottom: 48px;
+    }
+
+    footer span {
+      color: var(--red);
+    }
+
+    /* ── SCROLLBAR ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">EZ</div>
+    <span class="topbar-title">EZ PUBLISH</span>
+    <span class="topbar-badge">Roblox Tool</span>
+  </div>
+  <span class="topbar-right">BY AXO // 2026</span>
+</div>
+
+<div class="container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('universe')">Universe</button>
+    <button class="tab" onclick="switchTab('place')">Place</button>
+    <button class="tab" onclick="switchTab('log')">Log</button>
+  </div>
+
+  <!-- Universe Panel -->
+  <div id="panel-universe" class="panel active">
+    <div class="card">
+
+      <div class="field">
+        <label><span class="lnum">01</span> Security Cookie</label>
+        <input type="password" id="u-cookie" placeholder=".ROBLOSECURITY"
+               autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="hint">// wiped from this field the moment you click start</div>
+      </div>
+
+      <div class="field">
+        <label><span class="lnum">02</span> Template Place ID</label>
+        <input type="text" id="u-template" value="95206881" />
+        <div class="hint">// default 95206881 (baseplate)</div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label><span class="lnum">03</span> Count</label>
+          <input type="number" id="u-count" value="1" min="1" max="50" />
+        </div>
+        <div class="field">
+          <label><span class="lnum">04</span> Delay (s)</label>
+          <input type="number" id="u-delay" value="1" min="0.5" max="10" step="0.5" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="status-row">
+        <div class="dot" id="u-dot"></div>
+        <span id="u-status">READY</span>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="u-bar"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="u-btn" onclick="runUniverses()">▶ Start Creating</button>
+        <button class="btn btn-secondary" onclick="stop()">■ Stop</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Place Panel -->
+  <div id="panel-place" class="panel">
+    <div class="card">
+
+      <div class="field">
+        <label><span class="lnum">01</span> Security Cookie</label>
+        <input type="password" id="p-cookie" placeholder=".ROBLOSECURITY"
+               autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="hint">// wiped from this field the moment you click start</div>
+      </div>
+
+      <div class="field">
+        <label><span class="lnum">02</span> Universe ID</label>
+        <input type="text" id="p-universe" placeholder="e.g. 123456789" />
+      </div>
+
+      <div class="field">
+        <label><span class="lnum">03</span> Template Place ID</label>
+        <input type="text" id="p-template" value="95206881" />
+        <div class="hint">// default 95206881 (baseplate)</div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label><span class="lnum">04</span> Count</label>
+          <input type="number" id="p-count" value="1" min="1" max="50" />
+        </div>
+        <div class="field">
+          <label><span class="lnum">05</span> Delay (s)</label>
+          <input type="number" id="p-delay" value="1" min="0.5" max="10" step="0.5" />
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <div class="status-row">
+        <div class="dot" id="p-dot"></div>
+        <span id="p-status">READY</span>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="p-bar"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="p-btn" onclick="runPlaces()">▶ Start Creating</button>
+        <button class="btn btn-secondary" onclick="stop()">■ Stop</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Log Panel -->
+  <div id="panel-log" class="panel">
+    <div class="card" style="border-radius:4px;">
+      <div class="log-header">
+        <span class="log-title">// output log</span>
+        <button class="btn-link" onclick="clearLog()">clear</button>
+      </div>
+      <div class="log-box" id="log"></div>
+    </div>
+  </div>
+
+  <footer>EZ PUBLISH SERVICE &nbsp;·&nbsp; MADE WITH <span>♥</span> BY AXO</footer>
+
+</div>
+
+<script>
+  const WORKER_URL = 'YOUR_WORKER_URL_HERE';
+  let running = false;
+
+  const COOKIE_FIELDS = ['u-cookie', 'p-cookie'];
+
+  function wipeCookieFields() {
+    COOKIE_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+
+  window.addEventListener('beforeunload', wipeCookieFields);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') wipeCookieFields();
+  });
+
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['universe', 'place', 'log'][i] === id);
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+
+  function log(msg, type = 'info') {
+    const box = document.getElementById('log');
+    const ts = new Date().toTimeString().slice(0, 8);
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    const tsSpan = document.createElement('span');
+    tsSpan.className = 'log-ts';
+    tsSpan.textContent = ts;
+    const msgSpan = document.createElement('span');
+    msgSpan.className = 'log-' + type;
+    msgSpan.textContent = msg;
+    line.appendChild(tsSpan);
+    line.appendChild(msgSpan);
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  function clearLog() {
+    document.getElementById('log').innerHTML = '';
+  }
+
+  function setStatus(prefix, text, state) {
+    document.getElementById(prefix + '-status').textContent = text.toUpperCase();
+    document.getElementById(prefix + '-dot').className = 'dot' + (state ? ' ' + state : '');
+  }
+
+  function setProgress(prefix, val, total) {
+    document.getElementById(prefix + '-bar').style.width =
+      (total ? Math.round((val / total) * 100) : 0) + '%';
+  }
+
+  function stop() {
+    running = false;
+    log('Stop requested by user.', 'info');
+  }
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function callWorker(payload) {
+    const resp = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (resp.status === 429) {
+      const retryAfter = resp.headers.get('Retry-After') || '60';
+      return { ok: false, message: 'Rate limited. Try again in ' + retryAfter + 's.' };
+    }
+    if (resp.status === 403) {
+      return { ok: false, message: 'Request blocked by worker (origin not allowed).' };
+    }
+
+    return resp.json();
+  }
+
+  async function runUniverses() {
+    const cookieEl = document.getElementById('u-cookie');
+    const cookie   = cookieEl.value.trim();
+    const template = parseInt(document.getElementById('u-template').value) || 95206881;
+    const count    = parseInt(document.getElementById('u-count').value)    || 1;
+    const delay    = parseFloat(document.getElementById('u-delay').value)  || 1;
+
+    if (!cookie) { alert('Please paste your .ROBLOSECURITY cookie.'); return; }
+
+    cookieEl.value = '';
+
+    running = true;
+    switchTab('log');
+    document.getElementById('u-btn').disabled = true;
+    setProgress('u', 0, count);
+
+    let ok = 0, err = 0;
+    for (let i = 1; i <= count; i++) {
+      if (!running) { log('Stopped by user.', 'info'); break; }
+      setStatus('u', 'Creating universe ' + i + ' of ' + count + '...', 'running');
+      try {
+        const res = await callWorker({ action: 'createUniverse', cookie, templateId: template });
+        log('[Universe ' + i + '/' + count + '] ' + res.message, res.ok ? 'ok' : 'err');
+        res.ok ? ok++ : err++;
+      } catch (e) {
+        log('[Universe ' + i + '/' + count + '] Request failed.', 'err');
+        err++;
+      }
+      setProgress('u', i, count);
+      if (i < count && running) await sleep(delay * 1000);
+    }
+
+    setStatus('u', 'Done. ' + ok + ' succeeded, ' + err + ' failed.', ok > 0 ? 'done' : 'error');
+    log('Finished: ' + ok + ' universes created, ' + err + ' failed.', 'info');
+    document.getElementById('u-btn').disabled = false;
+    running = false;
+  }
+
+  async function runPlaces() {
+    const cookieEl   = document.getElementById('p-cookie');
+    const cookie     = cookieEl.value.trim();
+    const universeId = document.getElementById('p-universe').value.trim();
+    const template   = parseInt(document.getElementById('p-template').value) || 95206881;
+    const count      = parseInt(document.getElementById('p-count').value)    || 1;
+    const delay      = parseFloat(document.getElementById('p-delay').value)  || 1;
+
+    if (!cookie) { alert('Please paste your .ROBLOSECURITY cookie.'); return; }
+    if (!universeId || isNaN(universeId)) { alert('Please enter a valid Universe ID.'); return; }
+
+    cookieEl.value = '';
+
+    running = true;
+    switchTab('log');
+    document.getElementById('p-btn').disabled = true;
+    setProgress('p', 0, count);
+
+    let ok = 0, err = 0;
+    for (let i = 1; i <= count; i++) {
+      if (!running) { log('Stopped by user.', 'info'); break; }
+      setStatus('p', 'Creating place ' + i + ' of ' + count + '...', 'running');
+      try {
+        const res = await callWorker({ action: 'createPlace', cookie, universeId, templateId: template });
+        log('[Place ' + i + '/' + count + '] ' + res.message, res.ok ? 'ok' : 'err');
+        res.ok ? ok++ : err++;
+      } catch (e) {
+        log('[Place ' + i + '/' + count + '] Request failed.', 'err');
+        err++;
+      }
+      setProgress('p', i, count);
+      if (i < count && running) await sleep(delay * 1000);
+    }
+
+    setStatus('p', 'Done. ' + ok + ' succeeded, ' + err + ' failed.', ok > 0 ? 'done' : 'error');
+    log('Finished: ' + ok + ' places created, ' + err + ' failed.', 'info');
+    document.getElementById('p-btn').disabled = false;
+    running = false;
+  }
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@ Just Use Your Roblox Token To Create And It's Fully Safe Also The Backend I Will
 
 # Icon
 <p align="center">
-  <img src="images/Icon.png"
+  <img src="images/icon.png"
        alt="FY Programming Language"
        width="320"
        height="320"
